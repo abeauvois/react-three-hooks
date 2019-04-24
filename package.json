@@ -1,0 +1,28 @@
+{
+  "name": "react-three-fiber-hud-water-fxaa",
+  "version": "1.0.0",
+  "description": "with FBXLoader + loading  from Blender 2.8",
+  "keywords": [],
+  "main": "src/index.js",
+  "dependencies": {
+    "react": "16.8.6",
+    "react-dom": "16.8.6",
+    "react-scripts": "2.1.8",
+    "react-spring": "8.0.19",
+    "react-three-fiber": "2.0.1",
+    "three": "0.103.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test --env=jsdom",
+    "eject": "react-scripts eject"
+  },
+  "browserslist": [
+    ">0.2%",
+    "not dead",
+    "not ie <= 11",
+    "not op_mini all"
+  ]
+}
