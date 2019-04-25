@@ -7,9 +7,9 @@ import { useSpring, a } from 'react-spring/three'
 
 import { useAsync } from './useAsync'
 import * as resources from './resources/index'
-import './styles.css'
 import { FBXLoader } from './resources/loaders/FBXLoader'
-import { Group } from 'three'
+
+import './styles.css'
 // Make extra stuff available as native-elements (<effectComposer />, etc.)
 apply(resources)
 
@@ -31,6 +31,7 @@ function Content() {
   ))
 }
  */
+
 function Cube({ children }) {
   const rotation = () => ({
     rotation: [1, THREE.Math.degToRad(Math.random() * 90), THREE.Math.degToRad(Math.random() * 90)],
@@ -54,7 +55,6 @@ function Texture({ url }) {
   const texture = useMemo(() => new THREE.TextureLoader().load(url), [url])
   return <primitive attach="map" object={texture} />
 }
-
 function loadFBX(url) {
   return new Promise((resolve, reject) => {
     try {
@@ -78,30 +78,53 @@ function loadAllFBX(filenames) {
 
 function useAllFBX(filenames) {
   if (!filenames) throw Error(`[useFBX] Missing filenames argument: ${filenames}`)
-  //const toUrls = useCallback(() => filenames.map( f => `/${f}.fbx`),[filenames])
   return useAsync(loadAllFBX, [filenames])
+}
+
+function useAnimation() {
+  const anim = () => ({
+    rotation: [1, THREE.Math.degToRad(Math.random() * 90), THREE.Math.degToRad(Math.random() * 90)],
+    from: { rotation: [1, THREE.Math.degToRad(Math.random() * 90), THREE.Math.degToRad(Math.random() * 90)] }
+  })
+
+  const [animation, setAnimation, stopAnimation] = useSpring(() => anim())
+  useEffect(() => void setInterval(() => setAnimation({ ...anim() }), 4000), [])
+
+  // return (
+  //   <a.mesh visible userData={{ test: 'rotations' }} position={[0, 0, 0]}>
+  //     {React.Children.map(children, (child, i) => {
+  //       console.log(child.props)
+  //       return (
+  //        <primitive key={i} {...child.props} position={[0, 0, 0]} rotation={rot.rotation} scale={rot.rotation} />
+  //     )})}
+  //   </a.mesh>
+  // )
+  return { animation, setAnimation, stopAnimation }
+}
+
+function useInflate(inflate) {
+  const [triggered, setTriggered] = useState(inflate)
+  const [inflation, setInflation, stopInflation] = useSpring(() => ({from:{scale:[2, 2, 2]}}) )
+  console.log("useInflate",triggered)
+  triggered ? setInflation({scale:[4, 2, 2]}) : setInflation({scale:[2, 2, 2], from:{scale:[4, 2, 2]}}) 
+  return {inflation, setTriggered}
 }
 
 function Plane() {
   const [filenames, setFilenames] = useState(['cube extruded2', 'cube'])
+  const { animation } = useAnimation()
+  const { inflation, setTriggered } = useInflate(false)
+  
   const planeBody = useAllFBX(filenames)
   if (planeBody.error) console.log('error:', planeBody.error)
   if (planeBody.loading) return null
   const [body, head] = planeBody.result
+ 
   return (
-    <group>
-      <primitive
-        object={body.children[0]}
-        attach="geometry"
-        position={[0, 2, 3]}
-        scale={[2, 2, 2]}
-        rotation={[15, 15, 0]}
-      />
-      <meshStandardMaterial attach="material" color="red">
-        <Texture url="/paper.jpg" />
-      </meshStandardMaterial>
-      <primitive object={head.children[0]} position={[5, 2, 3]} scale={[2, 2, 2]} rotation={[0, 15, 0]} />
-    </group>
+    <a.group {...animation}>
+      <a.primitive onPointerOver={e => setTriggered(t =>!t)} object={body.children[0]} position={[0, 2, 3]} scale={[2, 2, 2]} {...inflation}/>
+      <a.primitive object={head.children[0]} position={[6, 2, 3]} scale={[3, 3, 3]} />
+    </a.group>
   )
 }
 
