@@ -8,7 +8,7 @@ import { useSpring, a } from 'react-spring/three'
 import { useAsync } from './useAsync'
 import * as resources from './resources/index'
 import './styles.css'
-import { FBXLoader } from './FBXLoader'
+import { FBXLoader } from './resources/loaders/FBXLoader'
 import { Group } from 'three'
 // Make extra stuff available as native-elements (<effectComposer />, etc.)
 apply(resources)
